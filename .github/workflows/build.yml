@@ -1,0 +1,39 @@
+name: Build Android 16 GSI
+
+on:
+  workflow_dispatch: # Allows you to manually trigger the workflow.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Set up environment
+      - name: Set up Build Environment
+        run: |
+          sudo apt update
+          sudo apt install -y openjdk-11-jdk ccache git-core bc flex bison gperf build-essential zip curl \
+            zlib1g-dev libncurses5-dev x11proto-core-dev libx11-dev libgl1-mesa-dev libxml2-utils xsltproc \
+            unzip fontconfig
+
+      # Step 2: Sync AOSP source for Android 16
+      - name: Sync AOSP Source
+        run: |
+          mkdir -p ~/aosp
+          cd ~/aosp
+          repo init -u https://android.googlesource.com/platform/manifest -b android-16.0.0_r1 --depth=1
+          repo sync -j4
+
+      # Step 3: Build the GSI
+      - name: Build System Image
+        run: |
+          cd ~/aosp
+          source build/envsetup.sh
+          lunch treble_arm64_bvS-userdebug
+          make -j4 systemimage
+
+      # Step 4: Upload the GSI as an artifact
+      - name: Upload GSI Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-16-gsi
+          path: ~/aosp/out/target/product/generic_arm64/system.img

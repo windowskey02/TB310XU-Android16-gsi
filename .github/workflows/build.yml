@@ -22,7 +22,7 @@ jobs:
           sudo apt update
           sudo apt install -y openjdk-11-jdk ccache git-core bc flex bison gperf build-essential zip curl \
             zlib1g-dev libncurses5-dev x11proto-core-dev libx11-dev libgl1-mesa-dev libxml2-utils xsltproc \
-            unzip fontconfig python3
+            unzip fontconfig python3 repo
 
       # Step 3: Sync AOSP Source and Clone phh-treble
       - name: Sync AOSP Source
